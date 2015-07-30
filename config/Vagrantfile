@@ -14,33 +14,32 @@ Vagrant.configure("2") do |config|
         sudo apt-get upgrade -y
         sudo apt-get install php5-xdebug -y
     	sudo service apache2 restart
-	
-        ## Only thing you probably really care about is right here
-        DOMAINS=("proyectos.local" "dev1.local")
+## Mas Proyectos?, crealos en este array, formato <dominio>:<carpeta-publica>
+DOMAINS=('proyectos.local:public' 'test.local:web')
 
-        ## Loop through all sites
-        for ((i=0; i < ${#DOMAINS[@]}; i++)); do
+## Loop through all sites
+for elt in "${DOMAINS[@]}"; do    
+    
+    IFS=: read DOMAIN DIRWEB <<< $elt
+    echo "$DOMAIN*$DIRWEB"
 
-            ## Current Domain
-            DOMAIN=${DOMAINS[$i]}
+            echo "Creando un directorio publico para $DOMAIN. Directorio: $DIRWEB"
+            mkdir -p /var/www/$DOMAIN/$DIRWEB
 
-            echo "Creating directory for $DOMAIN..."
-            mkdir -p /var/www/$DOMAIN/public
-
-            echo "Creating vhost config for $DOMAIN..."
+            echo "Creando configuracion vhost para $DOMAIN"
             sudo cp /etc/apache2/sites-available/scotchbox.local.conf /etc/apache2/sites-available/$DOMAIN.conf
 
-            echo "Updating vhost config for $DOMAIN..."
+            echo "Actualizando vhost para $DOMAIN"
             sudo sed -i s,scotchbox.local,$DOMAIN,g /etc/apache2/sites-available/$DOMAIN.conf
-            sudo sed -i s,/var/www/public,/var/www/$DOMAIN/public,g /etc/apache2/sites-available/$DOMAIN.conf
+            sudo sed -i s,/var/www/$DIRWEB,/var/www/$DOMAIN/$DIRWEB,g /etc/apache2/sites-available/$DOMAIN.conf
 
-            echo "Enabling $DOMAIN. Will probably tell you to restart Apache..."
+            echo "Enabling $DOMAIN"
             sudo a2ensite $DOMAIN.conf
 
-            echo "So let's restart apache..."
+            echo "Restart Apache ..."
             sudo service apache2 restart
-
-        done
+	    
+	done
 
     SHELL
 

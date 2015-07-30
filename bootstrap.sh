@@ -12,6 +12,12 @@ function pac {
 }
 
 
+if [ ! -x /usr/bin/dkms ] ; then                                
+    log "Utility dkms"
+    pac "dkms"
+    sudo dkms autoinstall
+fi
+
 if [ ! -x /usr/bin/terminator ] ; then                                
     log "Instalando Terminator"
     pac "terminator"
@@ -64,18 +70,24 @@ fi
 if [ ! -x /usr/bin/virtualbox ] ; then                                
     log "Instalando VirtualBox"
     pac "virtualbox"
+    pac "linux318-virtualbox-host-modules-5.0.0-1"
+    sudo systemctl enable dkms.service
+    sudo dkms autoinstall
+    pac "virtualbox-guest-utils"
+    
 fi
 
-#Carpeta de Proyectos
+#Carpeta de Proyectos Vagrant
 
 if [ ! -d ~/proyectos ]; then
-    mkdir ~/proyectos
-    cp ~/archiDotfiles/config/Vagrantfile ~/proyectos
-    mkdir ~/proyectos/public
-    cp ~/archiDotfiles/config/index.php ~/proyectos/public
-    sed -i "192.168.33.10 proyectos.dev proyectos" /etc/hosts
+    mkdir -p ~/proyectos/vagrant/proyectos.dev/public
+    cp ~/archiDotfiles/config/Vagrantfile ~/proyectos/vagrant
+    cp ~/archiDotfiles/config/index.php ~/proyectos/vagrant/proyectos.dev/public
+    #sed -i "192.168.33.10 proyectos.dev proyectos" /etc/hosts
     log "Agregando Host para Proyectos www.proyectos.dev"
 fi
+
+#Carpeta de Proyectos Docker
 
 if [ ! -x /usr/bin/vagrant ] ; then   
     log "Instalando Vagrant"

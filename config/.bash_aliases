@@ -91,6 +91,8 @@ alias zshrc="vim ~/.zshrc && reload"
 
 #Alias Folders
 alias proyectos="cd ~/proyectos"
+alias prova="cd ~/proyectos/vagrant"
+alias prodo="cd ~/proyectos/docker"
 
 #Tmux
 alias tmuxdev='~/dotfilesDev/tmux/tmuxdev'
